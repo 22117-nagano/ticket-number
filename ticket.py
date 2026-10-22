@@ -21,7 +21,10 @@ def save_counter(data):
     json.dump(data, f)
 
 
-if "my_number_150" not in st.session_state:
+# URLに番号が記録されている場合は、それを自動で復元する
+if "ticket" in st.query_params:
+  st.session_state.my_number_150 = st.query_params["ticket"]
+elif "my_number_150" not in st.session_state:
   st.session_state.my_number_150 = None
 
 st.title("🐓 1本（150円）整理番号")
@@ -48,5 +51,8 @@ else:
     data = load_counter()
     data["current"] += 1
     save_counter(data)
-    st.session_state.my_number_150 = data["current"]
+    new_num = str(data["current"])
+    st.session_state.my_number_150 = new_num
+    # URLに番号を保存する（リロード対策）
+    st.query_params["ticket"] = new_num
     st.rerun()
